@@ -42,19 +42,11 @@ function XToLevel.Average:Update()
             if XToLevel.Player.isActive then
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetKills       (XToLevel.Player:GetAverageKillsRemaining() or nil)
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetQuests      (XToLevel.Player:GetAverageQuestsRemaining() or nil)
-                XToLevel.AverageFrameAPI[self.activeAPI]:SetPetBattles  (XToLevel.Player:GetAveragePetBattlesRemaining() or nil)
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetDungeons    (XToLevel.Player:GetAverageDungeonsRemaining() or nil)
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetBattles     (XToLevel.Player:GetAverageBGsRemaining() or nil)
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetObjectives  (XToLevel.Player:GetAverageBGObjectivesRemaining() or nil)
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetProgress    (XToLevel.Lib:round((XToLevel.Player.currentXP or 0) / (XToLevel.Player.maxXP or 1) * 100, 1))
                 XToLevel.AverageFrameAPI[self.activeAPI]:SetGathering   (XToLevel.Player:GetAverageGatheringRequired())
-                XToLevel.AverageFrameAPI[self.activeAPI]:SetDigs        (XToLevel.Player:GetAverageDigsRequired() or nil)
-                
-                if XToLevel.db.profile.averageDisplay.guildProgressType == 1 then
-                    XToLevel.AverageFrameAPI[self.activeAPI]:SetGuildProgress (XToLevel.Player:GetGuildProgressAsPercentage(1))
-                else
-                    XToLevel.AverageFrameAPI[self.activeAPI]:SetGuildProgress (XToLevel.Player:GetGuildDailyProgressAsPercentage(1))
-                end
 
                 XToLevel.Player:UpdateTimer()
             end

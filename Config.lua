@@ -82,20 +82,6 @@ function XToLevel.Config:Initialize()
 		whileDead = true,
 		hideOnEscape = true,
 	}
-    StaticPopupDialogs['XToLevelConfig_ResetPetBattles'] = {
-		text = L["Reset Pet Battles Dialog"],
-		button1 = L["Yes"],
-		button2 = L["No"],
-		OnAccept = function()
-			XToLevel.Player:ClearPetBattles();
-			XToLevel.Average:Update();
-	        XToLevel.LDB:BuildPattern();
-	        XToLevel.LDB:Update();
-		end,
-		timeout = 0,
-		whileDead = true,
-		hideOnEscape = true,
-	}
 	StaticPopupDialogs['XToLevelConfig_ResetDungeons'] = {
 	    text = L["Reset Dungeon Dialog"],
 	    button1 = L["Yes"],
@@ -528,16 +514,6 @@ args = {
                     XToLevel.Average:Update()   
                 end,
             },
-            dataBattles = {
-                order = 19,
-                type = "toggle",
-                name = L["Player Battles"],
-                get = function(info) return XToLevel.db.profile.averageDisplay.playerBGs end,
-                set = function(info, value) 
-                    XToLevel.db.profile.averageDisplay.playerBGs = value 
-                    XToLevel.Average:Update()   
-                end,
-            },
             dataBattleObjectives = {
                 order = 20,
                 type = "toggle",
@@ -575,26 +551,6 @@ args = {
                 get = function(info) return XToLevel.db.profile.averageDisplay.playerGathering end,
                 set = function(info, value) 
                     XToLevel.db.profile.averageDisplay.playerGathering = value 
-                    XToLevel.Average:Update()   
-                end,
-            },
-            dataPetBattle = {
-                order = 24,
-                type = "toggle",
-                name = L["Pet Battles"] or "Pet Battles",
-                get = function(info) return XToLevel.db.profile.averageDisplay.playerPetBattles end,
-                set = function(info, value) 
-                    XToLevel.db.profile.averageDisplay.playerPetBattles = value 
-                    XToLevel.Average:Update()   
-                end,
-            },
-            dataArchaeology = {
-                order = 25,
-                type = "toggle",
-                name = L["Archaeology"] or "Archaeology",
-                get = function(info) return XToLevel.db.profile.averageDisplay.playerDigs end,
-                set = function(info, value) 
-                    XToLevel.db.profile.averageDisplay.playerDigs = value 
                     XToLevel.Average:Update()   
                 end,
             },
@@ -788,17 +744,6 @@ args = {
                     XToLevel.LDB:Update()
                 end,
             },
-            ldbDataBattles = {
-                order = 19,
-                type = "toggle",
-                name = L["Player Battles"],
-                get = function(i) return XToLevel.db.profile.ldb.text.bgs end,
-                set = function(i,v) 
-                    XToLevel.db.profile.ldb.text.bgs = v
-                    XToLevel.LDB:BuildPattern()
-                    XToLevel.LDB:Update()
-                end,
-            },
             ldbDataObjectives = {
                 order = 20,
                 type = "toggle",
@@ -843,17 +788,6 @@ args = {
                     XToLevel.LDB:Update()
                 end,
             },
-            ldbDataArchaeology = {
-                order = 24,
-                type = "toggle",
-                name = L["Archaeology"],
-                get = function(i) return XToLevel.db.profile.ldb.text.digs end,
-                set = function(i,v) 
-                    XToLevel.db.profile.ldb.text.digs = v
-                    XToLevel.LDB:BuildPattern()
-                    XToLevel.LDB:Update()
-                end,
-            },
         }
     },
     Data = {
@@ -889,16 +823,6 @@ args = {
                 step = 1,
                 get = function() return XToLevel.db.profile.averageDisplay.playerQuestListLength end,
                 set = function(i,v) XToLevel.Player:SetQuestAverageLength(v) end,
-            },
-            dataRangePetBattles = {
-                order = 4,
-                type = "range",
-                name = L["Pet Battles"],
-                min = 1,
-                max = 100,
-                step = 1,
-                get = function() return XToLevel.db.profile.averageDisplay.playerPetBattleListLength end,
-                set = function(i,v) XToLevel.Player:SetPetBattleAverageLength(v) end,
             },
             dataRangeBattles = {
                 order = 5,
@@ -964,12 +888,6 @@ args = {
                 name = L["Reset Battlegrounds"],
                 func = function() StaticPopup_Show("XToLevelConfig_ResetBattles")  end,
             },
-            dataClearPetBattles = {
-                order = 14,
-                type = "execute",
-                name = L["Reset Pet Battles"],
-                func = function() StaticPopup_Show("XToLevelConfig_ResetPetBattles")  end,
-            },
             dataClearGathering = {
                 order = 15,
                 type = "execute",
@@ -1021,13 +939,6 @@ args = {
                 name = L["Show Gathering Info"],
                 get = function(i) return XToLevel.db.profile.ldb.tooltip.showGatheringInfo end,
                 set = function(i,v) XToLevel.db.profile.ldb.tooltip.showGatheringInfo = v end,
-            },
-            archaeologyDetails = {
-                order = 7,
-                type = "toggle",
-                name = L["Show Archaeology Details"],
-                get = function(i) return XToLevel.db.profile.ldb.tooltip.showArchaeologyInfo end,
-                set = function(i,v) XToLevel.db.profile.ldb.tooltip.showArchaeologyInfo = v end,
             },
             timerDetails = {
                 order = 8,
@@ -1209,24 +1120,19 @@ function XToLevel.Config:GetDefaults()
 		        orientation = 'v',
 		        playerKills = true,
 		        playerQuests = true,
-                playerPetBattles = true,
 		        playerDungeons = true,
 		        playerBGs = true,
 		        playerBGOs = false,
                 playerGathering = true,
-                playerDigs = true,
 		        playerProgress = true,
 		        playerTimer = true,
 		        progress = true, -- Duplicate?
 		        progressAsBars = false,
 		        playerKillListLength = 10,
 		        playerQuestListLength = 10,
-                playerPetBattleListLength = 10,
 		        playerBGListLength = 15,
 		        playerBGOListLength = 15,
 		        playerDungeonListLength = 15,
-                guildProgress = true,
-                guildProgressType = 1, -- 1 = Level, 2 = Daily, (3 = Overall... maybe later)
 	        },
 	        ldb = {
                 enabled = true,
@@ -1242,15 +1148,12 @@ function XToLevel.Config:GetDefaults()
 			        bgs = true,
 			        bgo = false,
                     gather = true,
-                    digs = true,
 			        xp = true,
 			        xpnum = true,
 			        xpnumFormat = true,
 			        xpAsBars = false,
 			        xpCountdown = false,
 			        timer = true,
-                    guildxp = true,
-                    guilddaily = true,
 			        colorValues = true,
 			        verbose = true,
 			        rested = true,
@@ -1263,8 +1166,6 @@ function XToLevel.Config:GetDefaults()
 			        showDungeonInfo = true,
 			        showTimerInfo = true,
                     showGatheringInfo = true,
-                    showArchaeologyInfo = true,
-                    showGuildInfo = true,
 		        }
 	        },
 	        timer = {
@@ -1291,14 +1192,12 @@ function XToLevel.Config:GetDefaults()
 		        questList = {},
 		        bgList = {},
 		        dungeonList = {},
-                petBattleList = {},
 		        timer = {
 			        start = nil,
 			        total = nil,
 			        xpPerSec = nil,
 		        },
                 gathering = {},
-                digs = {},
                 npcXP = { },
 	        },
 	        customPattern = nil,

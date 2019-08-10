@@ -221,10 +221,6 @@ function XToLevel.Tooltip:Show(frame, anchorPont, relativeFrame, relativePoint, 
         GameTooltip:AddLine(L['Quests'])
         self:AddQuestRange()
         GameTooltip:AddLine(" ")
-    elseif mode == "petBattles" then
-        GameTooltip:AddLine(L['Pet Battles'])
-        self:AddPetBattleRange()
-        GameTooltip:AddLine(" ")
     elseif mode == "dungeons" then
         GameTooltip:AddLine(L['Dungeons'])
         self:AddDungeonInfo()
@@ -239,10 +235,6 @@ function XToLevel.Tooltip:Show(frame, anchorPont, relativeFrame, relativePoint, 
             self:AddGatheringDetails()
             GameTooltip:AddLine(" ")
         end
-    elseif mode == "archaeology" then
-        GameTooltip:AddLine(L['Archaeology'] or "Archaeology")
-        self:AddArchaeology()
-        GameTooltip:AddLine(" ")
     elseif mode == "experience" then
         GameTooltip:AddLine(L['Experience'])
         self:AddExperience()
@@ -250,10 +242,6 @@ function XToLevel.Tooltip:Show(frame, anchorPont, relativeFrame, relativePoint, 
     elseif mode == "timer" then
         GameTooltip:AddLine("Time to level")
         self:AddTimerDetailes(false)
-        GameTooltip:AddLine(" ")
-    elseif mode == "guild" then
-        GameTooltip:AddLine(L['Guild'] .. ": ")
-        self:AddGuildInfo()
         GameTooltip:AddLine(" ")
     else
         -- The old "overall" tootip
@@ -276,11 +264,6 @@ function XToLevel.Tooltip:Show(frame, anchorPont, relativeFrame, relativePoint, 
                 self:AddExperience()
                 GameTooltip:AddLine(" ")
             end
-            if XToLevel.db.profile.ldb.tooltip.showGuildInfo then
-                GameTooltip:AddLine(L['Guild'] .. ": ")
-                self:AddGuildInfo()
-                GameTooltip:AddLine(" ")
-            end
             if XToLevel.db.profile.ldb.tooltip.showGatheringInfo then
                 GameTooltip:AddLine((L["Gathering"] or "Gathering") .. ": ")
                 self:AddGathering()
@@ -289,11 +272,6 @@ function XToLevel.Tooltip:Show(frame, anchorPont, relativeFrame, relativePoint, 
                     self:AddGatheringDetails()
                     GameTooltip:AddLine(" ")
                 end
-            end
-            if XToLevel.db.profile.ldb.tooltip.showArchaeologyInfo then
-                GameTooltip:AddLine((L["Archaeology"] or "Archaeology") .. ": ")
-                self:AddArchaeology()
-                GameTooltip:AddLine(" ")
             end
             if XToLevel.Lib:ShowDungeonData() then
                 self:AddDungeons()
@@ -359,16 +337,6 @@ function XToLevel.Tooltip:AddQuestRange()
     GameTooltip:AddDoubleLine(" " .. L["Min"] .. ":" , XToLevel.Lib:NumberFormat(XToLevel.Player:GetQuestsRequired(range.high)) .." @ ".. XToLevel.Lib:NumberFormat(XToLevel.Lib:round(range.high, 0)) .." xp", self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)
     GameTooltip:AddDoubleLine(" " .. L["Max"] .. ":" , XToLevel.Lib:NumberFormat(XToLevel.Player:GetQuestsRequired(range.low)) .." @ ".. XToLevel.Lib:NumberFormat(XToLevel.Lib:round(range.low, 0)) .." xp", self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)
 end
-
----
--- function description
-function XToLevel.Tooltip:AddPetBattleRange()
-    local range = XToLevel.Player:GetPetBattleXpRange();
-    GameTooltip:AddDoubleLine(" " .. L["Average"] .. ":" , XToLevel.Lib:NumberFormat(XToLevel.Player:GetPetBattlesRequired(range.average)) .." @ ".. XToLevel.Lib:NumberFormat(XToLevel.Lib:round(range.average, 0)) .." xp", self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)
-    GameTooltip:AddDoubleLine(" " .. L["Min"] .. ":" , XToLevel.Lib:NumberFormat(XToLevel.Player:GetPetBattlesRequired(range.high)) .." @ ".. XToLevel.Lib:NumberFormat(XToLevel.Lib:round(range.high, 0)) .." xp", self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)
-    GameTooltip:AddDoubleLine(" " .. L["Max"] .. ":" , XToLevel.Lib:NumberFormat(XToLevel.Player:GetPetBattlesRequired(range.low)) .." @ ".. XToLevel.Lib:NumberFormat(XToLevel.Lib:round(range.low, 0)) .." xp", self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)
-end
-
 
 ---
 -- function description
@@ -457,26 +425,6 @@ function XToLevel.Tooltip:AddExperience()
     xpProgress = nil
     xpNeededTotal = nil
     xpNeededActual = nil
-end
-
----
--- Guild info
-function XToLevel.Tooltip:AddGuildInfo()
-    if XToLevel.Player.guildLevel ~= nil and XToLevel.Player.guildXP ~= nil then
-        GameTooltip:AddDoubleLine(" Level:" , XToLevel.Player.guildLevel .. ' / 25', self.labelColor.r, self.labelColor.g, self.labelColor.b,    self.dataColor.r, self.dataColor.b, self.dataColor.b)
-
-        local xpGained = tostring(XToLevel.Lib:ShrinkNumber(XToLevel.Player.guildXP))
-        local xpTotal = tostring(XToLevel.Lib:ShrinkNumber(XToLevel.Player.guildXPMax))
-        local xpProgress = tostring(XToLevel.Player:GetGuildProgressAsPercentage(1))
-        GameTooltip:AddDoubleLine(" " .. L["XP Progress"] .. ": " , xpGained .. ' / ' .. xpTotal .. ' [' .. xpProgress .. '%]' , self.labelColor.r, self.labelColor.g, self.labelColor.b,    self.dataColor.r, self.dataColor.b, self.dataColor.b)
-
-        local dialyGained = tostring(XToLevel.Lib:ShrinkNumber(XToLevel.Player.guildXPDaily))
-        local dialyTotal = tostring(XToLevel.Lib:ShrinkNumber(XToLevel.Player.guildXPDailyMax))
-        local dialyProgress = tostring(XToLevel.Player:GetGuildDailyProgressAsPercentage(1))
-        GameTooltip:AddDoubleLine(" " .. L['Daily Progress'] .. ": " , dialyGained .. ' / ' .. dialyTotal .. ' [' .. dialyProgress .. '%]' , self.labelColor.r, self.labelColor.g, self.labelColor.b,    self.dataColor.r, self.dataColor.b, self.dataColor.b)
-    else
-        GameTooltip:AddLine(" No guild leveling info found.", self.labelColor.r, self.labelColor.g, self.labelColor.b)
-    end
 end
 
 ---
@@ -592,17 +540,6 @@ end
 function XToLevel.Tooltip:AddGathering()
     local linesAdded = 0
     local nodesRequired, xpPerNode = XToLevel.Player:GetAverageGatheringRequired()
-    if nodesRequired ~= nil then
-        xpPerNode = XToLevel.Lib:NumberFormat(XToLevel.Lib:round(xpPerNode, 0))
-        GameTooltip:AddDoubleLine(L["Average"] .. ": ", nodesRequired.. " @ " .. xpPerNode .. " xp" , self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)
-    else
-        GameTooltip:AddLine(" " .. L['No Battles Fought'], self.labelColor.r, self.labelColor.b, self.labelColor.b)
-    end
-end
-
-function XToLevel.Tooltip:AddArchaeology()
-    local linesAdded = 0
-    local nodesRequired, xpPerNode = XToLevel.Player:GetAverageDigsRequired()
     if nodesRequired ~= nil then
         xpPerNode = XToLevel.Lib:NumberFormat(XToLevel.Lib:round(xpPerNode, 0))
         GameTooltip:AddDoubleLine(L["Average"] .. ": ", nodesRequired.. " @ " .. xpPerNode .. " xp" , self.labelColor.r, self.labelColor.g, self.labelColor.b, self.dataColor.r, self.dataColor.b, self.dataColor.b)

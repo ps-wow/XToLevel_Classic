@@ -153,11 +153,6 @@ XToLevel.AverageFrameAPI["Classic"] =
         else
             self.lines.playerDungeons:Show()
         end
-        if not XToLevel.Player.isActive or not XToLevel.Player:HasPetBattleInfo() then
-            self.lines.playerPetBattles:Hide()
-        else
-            self.lines.playerPetBattles:Show()
-        end
         if not XToLevel.Player.isActive or (XToLevel.Player:GetAverageBGsRemaining() == nil or not XToLevel.Lib:ShowBattlegroundData()) then
             self.lines.playerBGs:Hide()
         else
@@ -185,12 +180,6 @@ XToLevel.AverageFrameAPI["Classic"] =
             self.lines.playerGathering:Show()
         else
             self.lines.playerGathering:Hide()
-        end
-        
-        if XToLevel.Player.isActive and XToLevel.db.profile.averageDisplay.playerDigs and XToLevel.Player:HasDigInfo() then
-            self.lines.playerDigs:Show()
-        else
-            self.lines.playerDigs:Hide()
         end
     end,
     
@@ -296,9 +285,7 @@ XToLevel.AverageFrameAPI["Classic"] =
         self:CreateLine('playerDungeons', 'player', 4, 'dungeons', L["Dungeons"], 'XToLevel_span')
         self:CreateLine('playerBGs', 'player', 5, 'bg', L["Battles"], 'XToLevel_span')
         self:CreateLine('playerBGOs', 'player', 6, 'bg', L["Objectives"], 'XToLevel_span')
-        self:CreateLine('playerPetBattles', 'player', 7, 'petBattles', L["Pet Battles"], 'XToLevel_span')
         self:CreateLine('playerGathering', 'player', 8, 'gathering', L["Gathering"], 'XToLevel_span')
-        self:CreateLine('playerDigs', 'player', 9, 'archaeology', L["Digs"], 'XToLevel_span')
         self:CreateLine('playerProgress', 'player', 10, 'experience', L["XP Percent"], 'XToLevel_span')
         self:CreateLine('playerTimer', 'player', 11, 'timer', L["Player Timer"], "XToLevel_span")
     end,
@@ -320,12 +307,12 @@ XToLevel.AverageFrameAPI["Classic"] =
             return false
         end
     end,
-    
+
     --- Called each time an event is fired.
     OnEvent = function(self)
         return true
     end,
-    
+
     ---
     -- function description
     GetTextColor = function(self, type)
@@ -345,27 +332,22 @@ XToLevel.AverageFrameAPI["Classic"] =
     SetKills = function(self, value)
         self:WriteToLine("playerKills", "Kills", value, self:GetTextColor("player"))
     end,
-    
+
     --- Sets the quest value for the frame
     SetQuests = function(self, value)
         self:WriteToLine("playerQuests", "Quests", value, self:GetTextColor("player"))
     end,
-    
-    --- Sets the pet battle value for the frame
-    SetPetBattles = function(self, value)
-        self:WriteToLine("playerPetBattles", "Pet Battles", value, self:GetTextColor("player"))
-    end,
-    
+
     --- Sets the dungeon value for the frame
     SetDungeons = function(self, value)
         self:WriteToLine("playerDungeons", "Dungeons", value, self:GetTextColor("player"))
     end,
-    
+
     --- Sets the battle value for the frame
     SetBattles = function(self, value)
         self:WriteToLine("playerBGs", "Battles", value, self:GetTextColor("player"))
     end,
-    
+
     --- Sets the objectives value for the frame
     SetObjectives = function(self, value)
         self:WriteToLine("playerBGOs", "Objectives", value, self:GetTextColor("player"))
@@ -381,25 +363,14 @@ XToLevel.AverageFrameAPI["Classic"] =
             self:WriteToLine("playerProgress", "XP Percent", percent .. "%", self:GetTextColor("player")) 
         end
     end,
-    
+
     --- Sets the timer value.
     SetTimer = function(self, shortValue, longValue)
         self:WriteToLine("playerTimer", "Timer", longValue, self:GetTextColor("player"))
     end,
-    
+
     --- Sets the gathering value.
     SetGathering = function(self, value)
         self:WriteToLine("playerGathering", "Gathering", value, self:GetTextColor("player"))
-    end,
-    
-    --- Sets the dig value.
-    SetDigs = function(self, value)
-        self:WriteToLine("playerDigs", "Digs", value, self:GetTextColor("player"))
-    end,
-    
-    --- Sets the guild progress value. NOT IMPLEMENTED IN THIS FRAME!
-    -- TODO: Implement this feature.
-    SetGuildProgress = function(self, value)
-        return true
     end,
 }

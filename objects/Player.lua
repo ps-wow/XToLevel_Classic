@@ -62,18 +62,9 @@ XToLevel.Player = {
     dungeonAverage = nil,
 	killListLength = 100, -- The max allowed value, not the current selection.
 	questListLength = 100,
-    petBattleListLength = 50,
 	bgListLength = 300,
 	dungeonListLength = 100,
-    digListLength = 100,
 	hasEnteredBG = true,
-    
-    guildLevel = nil,
-    guildXP = nil,
-    guildXPMax = nil,
-    guildXPDaily = nil,
-    guildXPDailyMax = nil,
-    guildHasQueried = false,
 	
 	timePlayedTotal = nil,
 	timePlayedLevel = nil,
@@ -92,18 +83,11 @@ XToLevel.Player = {
     
     percentage = nil,
 	lastKnownXP = nil,
-    
-    guildPercentage = nil,
-    guildLastKnownXP = nil,
-    
-    guildDailyPercentage = nil,
-    guildDailyLastKnownXP = nil,
 }
 	
 -- Constructor
 function XToLevel.Player:Initialize()
     self:SyncData()
-    --self:SyncGuildData()
 
     self:GetMaxLevel();
 
@@ -128,7 +112,7 @@ end
 ---
 function XToLevel.Player:GetMaxLevel()
     if self.maxLevel == nil then
-        self.maxLevel = MAX_PLAYER_LEVEL_TABLE[GetExpansionLevel()]
+        self.maxLevel = 60
     end
     return self.maxLevel
 end
@@ -191,33 +175,6 @@ function XToLevel.Player:SyncData()
 
     local rested = GetXPExhaustion() or 0
     self.restedXP = rested / 2
-end
-
----
--- Updates the guild XP info.
----
-function XToLevel.Player:SyncGuildData()
-    if IsInGuild() then
-        self.guildLevel = GetGuildLevel();
-
-        local currentXP, remainingXP, dailyXP, maxDailyXP = UnitGetGuildXP("player");
-        -- maxDailyXP is the only field that *should* always be positive.
-        if maxDailyXP > 0 then 
-            self.guildXP = currentXP;
-            self.guildXPMax = currentXP + remainingXP;
-            self.guildXPDaily = dailyXP;
-            self.guildXPDailyMax = maxDailyXP;
-        elseif not self.guildHasQueried then
-            QueryGuildXP()
-            self.guildHasQueried = true;
-        end
-    else
-        self.guildLevel = nil
-        self.guildXP =  nil;
-        self.guildXPMax =  nil;
-        self.guildXPDaily = nil;
-        self.guildXPDailyMax = nil;
-    end
 end
 
 --- Updates the time played values.
@@ -462,15 +419,6 @@ function XToLevel.Player:AddGathering(action, target, xp)
     end
 end
 
-function XToLevel.Player:AddDig(xpGained)
-    self.digAverage = nil
-    self.currentXP = self.currentXP + xpGained
-    table.insert(XToLevel.db.char.data.digs, 1, xpGained)
-    if(# XToLevel.db.char.data.digs > self.digListLength) then
-        table.remove(XToLevel.db.char.data.digs)
-    end
-end
-
 ---
 -- Get the total number of the given target to reach then next level.
 -- If the item is invalid, or none of them have been recorded yet, this
@@ -639,61 +587,6 @@ function XToLevel.Player:HasGatheringInfo()
     end
 end
 
----
--- Determines whether there is any dig info available yet.
-function XToLevel.Player:HasDigInfo()
-    if type(XToLevel.db.char.data.digs) == "table" then
-        return (# XToLevel.db.char.data.digs > 0)
-    else
-        return nil
-    end
-end
-
----
--- Determines the average XP for the current dig-site list.
-function XToLevel.Player:GetAverageDigXP()
-    if type(XToLevel.db.char.data.digs) == "table" then
-        local tXP = 0;
-        local tCount = 0;
-        for i, xp in ipairs(XToLevel.db.char.data.digs) do
-            tXP = tXP + xp
-            tCount = tCount + 1
-        end
-        if tXP > 0 and tCount > 0 then
-            return (tXP / tCount)
-        else
-            return nil
-        end
-    else
-        return nil
-    end
-end
-
----
--- Determines the average dig-sites required for next level.
-function XToLevel.Player:GetAverageDigsRequired()
-    local averageXP = self:GetAverageDigXP()
-    if type(averageXP) == "number" and averageXP > 0 then
-        local required = ceil((self.maxXP - self.currentXP) / averageXP);
-        if type(required) == "number" and required > 0 then
-            return required, averageXP
-        else
-            return nil
-        end
-    else
-        return nil
-    end
-end
-
----
--- Determines whether there is any pet battles info to show.
-function XToLevel.Player:HasPetBattleInfo()
-    if type(XToLevel.db.char.data.petBattleList) == "table" then
-        return (# XToLevel.db.char.data.petBattleList > 0)
-    else
-        return false
-    end
-end
 
 ---
 -- Start recording a battleground. If a battleground is already in progress
@@ -957,21 +850,6 @@ function XToLevel.Player:GetQuestsRequired(xp)
 end
 
 ---
--- Gets the amount of pet battles required to reach the next level, based on the
--- passed XP value.
--- @param xp The XP assumed per battle
--- @return An integer or -1 if the input parameter is invalid.
----
-function XToLevel.Player:GetPetBattlesRequired(xp)
-    local xpRemaining = self.maxXP - self.currentXP
-    if(xp > 0) then
-        return ceil(xpRemaining / xp)
-    else
-        return -1
-    end
-end
-
----
 -- Get the average XP value for all gathering items within a specific range.
 -- @param levelRange The number of levels to go back to fetch data.
 --                   Defaults to 2 (that is: this and the last level)
@@ -1040,42 +918,6 @@ function XToLevel.Player:GetRestedPercentage(fractions)
         fractions = 0
     end
     return XToLevel.Lib:round((self.restedXP * 2) / self.maxXP * 100, fractions, true);
-end
-
-----------------------------------------------------------------------------
--- Guild methods
-----------------------------------------------------------------------------
----
--- Gets the percentage the player's guild has gained towards it's next level.
--- @param fractions The number of fractions to include. Defaults to 1.
--- @return A number between 0 and 100.
-function XToLevel.Player:GetGuildProgressAsPercentage(fractions)
-    if type(fractions) ~= "number" or fractions <= 0 then
-        fractions = 1
-    end
-    if self.guildPercentage == nil or self.guildLastKnownXP == nil or self.guildLastKnownXP ~= self.guildXP then
-        self.guildLastKnownXP = self.guildXP
-        self.guildPercentage = (self.guildXP or 0) / (self.guildXPMax or 1) * 100
-    end
-    return XToLevel.Lib:round(self.guildPercentage, fractions)
-end
-
-function XToLevel.Player:GetGuildXpRemaining() 
-    return self.guildXPMax - self.guildXP
-end
-
-function XToLevel.Player:GetGuildDailyProgressAsPercentage(fractions)
-    if type(fractions) ~= "number" or fractions <= 0 then
-        fractions = 1
-    end
-    if self.guildDailyPercentage == nil or self.guildDailyLastKnownXP == nil or self.guildDailyLastKnownXP ~= self.guildXP then
-        self.guildDailyLastKnownXP = self.guildXPDaily
-        self.guildDailyPercentage = (self.guildXPDaily or 0) / (self.guildXPDailyMax or 1) * 100
-    end
-    return XToLevel.Lib:round(self.guildDailyPercentage, fractions)
-end
-function XToLevel.Player:GetGuildDailyXpRemaining() 
-    return self.guildXPDailyMax - self.guildXPDaily
 end
 
 ---
@@ -1277,51 +1119,6 @@ function XToLevel.Player:GetQuestXpRange ()
         }
     else
         return self.questRange
-    end
-end
-
----
--- Calculates the average, highest and lowest XP values recorded for pet battles.
--- The range of data used is limited by the 
--- XToLevel.db.profile.averageDisplay.playerPetBattleListLength config directive. 
--- @return A table as : { 'average', 'high', 'low' }
----
-function XToLevel.Player:GetPetBattleXpRange ()   
-    if (# XToLevel.db.char.data.petBattleList > 0) then
-        local range = {
-            average = 0,
-            high = 0,
-            low = 9999999
-        }
-        
-        local maxUsed = # XToLevel.db.char.data.petBattleList
-        if maxUsed > XToLevel.db.profile.averageDisplay.playerPetBattleListLength then
-            maxUsed = XToLevel.db.profile.averageDisplay.playerPetBattleListLength
-        end
-        
-        local total = 0
-        local count = 0
-        for index, value in ipairs(XToLevel.db.char.data.petBattleList) do
-            if index > maxUsed then
-                break;
-            end
-            
-            if value > range.high then
-                range.high = value
-            end
-            if value < range.low then
-                range.low = value
-            end
-            total = total + value
-            count = count + 1
-        end
-        range.average = (total / count)
-        
-        if range.low == 9999999 then
-            range.low = range.high
-        end
-        
-        return range
     end
 end
 
@@ -1807,16 +1604,6 @@ end
 function XToLevel.Player:SetQuestAverageLength(newValue)
     XToLevel.db.profile.averageDisplay.playerQuestListLength = newValue
     self.questAverage = nil
-    XToLevel.Average:Update()
-    XToLevel.LDB:BuildPattern()
-    XToLevel.LDB:Update()
-end
-
----
--- Sets the number of pet battles used for average calculations
-function XToLevel.Player:SetPetBattleAverageLength(newValue)
-    XToLevel.db.profile.averageDisplay.playerPetBattleListLength = newValue
-    self.petBattleAverage = nil
     XToLevel.Average:Update()
     XToLevel.LDB:BuildPattern()
     XToLevel.LDB:Update()

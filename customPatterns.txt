@@ -23,8 +23,6 @@ Availble tags:
 * <rested> - The EXTRA experience you will collect for mob kills.
 * <restedp> - The percentage of your current level the rested bonus covers. (150% or 30 bars is the ceiling)
 * <timer> - The estimated time remaining until you reach your next level, based on your current XP per hour.
-* <guildxp> - The percentage completed of the current level for your guild. (Experimental!)
-* <guilddaily> - The percentage completed of the current daily maximum for you guild. (Experimental!)
 
 (Note, that the <xp> and <petxp> values inlucde the % char at the end.)
 

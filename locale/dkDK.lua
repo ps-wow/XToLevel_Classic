@@ -62,7 +62,6 @@ L['Average'] = "Nogenlunde"
 L['Max'] = "Max"
 L['Min'] = "Min"
 L['Kills to level'] = "Kills to level"
-L['Guild'] = 'Guild'
 L['Gathering'] = "Gathering"
 L['Max Level LDB Message'] = "Højeste niveau nået. De LDB datakilder, vil automatisk blive deaktiveret næste gang UI genindlæses."
 

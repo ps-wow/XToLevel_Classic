@@ -10,7 +10,7 @@ end
 -- Control methods and members for the XToLevel_AvergeFrame window.
 -- @class table
 -- 
-XToLevel.AverageFrameAPI["Blocky"] = 
+XToLevel.AverageFrameAPI["Blocky"] =
 {
     isMoving = false,
     lastTooltip = nil,
@@ -19,7 +19,7 @@ XToLevel.AverageFrameAPI["Blocky"] =
     --- Called when the frame first loads
     Initialize = function(self)
 	    local iconName = (UnitFactionGroup("player") == "Alliance") and "battle_ally_icon.tga" or "battle_horde_icon.tga"
-	    XToLevel_AverageFrame_Blocky_PlayerFrameCounterBattlesIcon:SetTexture("Interface\\AddOns\\XToLevel\\textures\\" .. iconName)
+	    XToLevel_AverageFrame_Blocky_PlayerFrameCounterBattlesIcon:SetTexture("Interface\\AddOns\\XToLevel_Classic\\textures\\" .. iconName)
         
         -- Fetch boxes
         self.playerBoxes = {
@@ -46,17 +46,9 @@ XToLevel.AverageFrameAPI["Blocky"] =
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterObjectives,
 	            visible = XToLevel.db.profile.averageDisplay.playerBGOs
 	        },
-            {   name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterPetBattles',
-	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterPetBattles,
-	            visible = XToLevel.db.profile.averageDisplay.playerPetBattles
-	        },
 	        {   name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterGathering',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterGathering,
 	            visible = XToLevel.db.profile.averageDisplay.playerGathering
-	        },
-            {   name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterDigs',
-	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterDigs,
-	            visible = XToLevel.db.profile.averageDisplay.playerDigs
 	        },
 	        {   
 	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgress',
@@ -67,11 +59,6 @@ XToLevel.AverageFrameAPI["Blocky"] =
 	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterTimer',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterTimer,
 	            visible = XToLevel.db.profile.averageDisplay.playerTimer
-	        },
-	        {   
-	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterGuildProgress',
-	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterGuildProgress,
-	            visible = XToLevel.db.profile.averageDisplay.guildProgress
 	        }
 	    }
         
@@ -185,7 +172,7 @@ XToLevel.AverageFrameAPI["Blocky"] =
     
     ---
     -- function description
-    StackPlayer = function(self)           
+    StackPlayer = function(self)
         self.playerBoxes[1]["visible"] = XToLevel.db.profile.averageDisplay.playerKills
         self.playerBoxes[2]["visible"] = XToLevel.db.profile.averageDisplay.playerQuests
         self.playerBoxes[3]["visible"] = XToLevel.db.profile.averageDisplay.playerDungeons and XToLevel.Player.level >= 15
@@ -193,10 +180,8 @@ XToLevel.AverageFrameAPI["Blocky"] =
         self.playerBoxes[5]["visible"] = XToLevel.db.profile.averageDisplay.playerBGOs and XToLevel.Player.level >= 10
         self.playerBoxes[6]["visible"] = XToLevel.db.profile.averageDisplay.playerPetBattles and XToLevel.Player:HasPetBattleInfo()
         self.playerBoxes[7]["visible"] = XToLevel.db.profile.averageDisplay.playerGathering and XToLevel.Player:HasGatheringInfo()
-        self.playerBoxes[8]["visible"] = XToLevel.db.profile.averageDisplay.playerDigs and XToLevel.Player:HasDigInfo()
-        self.playerBoxes[9]["visible"] = XToLevel.db.profile.averageDisplay.playerProgress
-		self.playerBoxes[10]["visible"] = XToLevel.db.profile.averageDisplay.playerTimer and XToLevel.db.profile.averageDisplay.playerTimer
-        self.playerBoxes[11]["visible"] = XToLevel.db.profile.averageDisplay.guildProgress and type(XToLevel.Player.guildXP) == 'number'
+        self.playerBoxes[8]["visible"] = XToLevel.db.profile.averageDisplay.playerProgress
+		self.playerBoxes[9]["visible"] = XToLevel.db.profile.averageDisplay.playerTimer and XToLevel.db.profile.averageDisplay.playerTimer
     
         local orientation = XToLevel.db.profile.averageDisplay.orientation or 'v'
         self:StackBoxes(orientation, self.playerBoxes, XToLevel_AverageFrame_Blocky_PlayerFrame, 'XToLevel_AverageFrame_Blocky_PlayerFrame');
@@ -256,11 +241,6 @@ XToLevel.AverageFrameAPI["Blocky"] =
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterQuestsValueText:SetText(tonumber(value))
     end,
     
-    --- Sets the quest value for the frame
-    SetPetBattles = function(self, value)
-        XToLevel_AverageFrame_Blocky_PlayerFrameCounterPetBattlesValueText:SetText(tonumber(value))
-    end,
-    
     --- Sets the dungeon value for the frame
     SetDungeons = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterDungeonsValueText:SetText(tonumber(value))
@@ -280,11 +260,6 @@ XToLevel.AverageFrameAPI["Blocky"] =
     SetGathering = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterGatheringValueText:SetText(tonumber(value))
     end,
-    
-    --- Sets the archaeology average
-    SetDigs = function(self, value)
-        XToLevel_AverageFrame_Blocky_PlayerFrameCounterDigsValueText:SetText(tonumber(value))
-    end,
 
     --- Sets the value for the progress bar.
     -- Changes both the progress bar and the text.
@@ -294,36 +269,6 @@ XToLevel.AverageFrameAPI["Blocky"] =
             local progressBar = XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgressBar
             local progressBarColor = XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgressBarColor
             local progressText = XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgressValueText
-            
-            local totalWidth = progressFrame:GetWidth() - 5
-            local barWidth = totalWidth * (percent / 100)
-            local bars = ceil((100 - percent) / 5)
-            
-            if barWidth == 0 then
-                barWidth = 1
-            end
-            
-            local hex, rgb = XToLevel.Lib:GetProgressColor(percent)
-            rgb = { r= (rgb.r / 256), g= (rgb.g) / 256, b= (rgb.b / 256) }
-            
-            progressBar:SetWidth(barWidth)
-            if XToLevel.db.profile.averageDisplay.progressAsBars then
-                progressText:SetText(tostring(bars) .. " " .. L['Bars'])
-            else
-                progressText:SetText(tostring(floor(percent)) .. "%")
-            end
-            progressText:SetTextColor(rgb.r, rgb.g, rgb.b, 1.0)
-        end
-    end,
-    
-    --- Sets the value for the progress bar.
-    -- Changes both the progress bar and the text.
-    SetGuildProgress = function(self, percent)
-        if percent ~= nil and (percent >= 0 and percent <= 100) then
-            local progressFrame = XToLevel_AverageFrame_Blocky_PlayerFrameCounterGuildProgress
-            local progressBar = XToLevel_AverageFrame_Blocky_PlayerFrameCounterGuildProgressBar
-            local progressBarColor = XToLevel_AverageFrame_Blocky_PlayerFrameCounterGuildProgressBarColor
-            local progressText = XToLevel_AverageFrame_Blocky_PlayerFrameCounterGuildProgressValueText
             
             local totalWidth = progressFrame:GetWidth() - 5
             local barWidth = totalWidth * (percent / 100)
