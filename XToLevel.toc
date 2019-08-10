@@ -1,0 +1,38 @@
+## Interface: 80200
+## Title: XToLevel
+## Author: Gator7778, Gator#1210
+## Version: 8.1.5
+## Notes: Shows mobs, quests, dungeons and battles needed until you reach your next level.
+## eMail: snichols7778@gmail.com
+## URL: https://www.curseforge.com/wow/addons/xtolevel-future
+## X-Compatible-With: 70000
+## X-Since-Interface: 40100
+## X-Category: Quest
+## OptionalDeps: LibStub,CallbackHandler-1.0,LibDataBroker-1.1,AceTimer-3.0,AceConfig-3.0,AceGUI-3.0,AceDB-3.0,AceDBOptions-3.0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## SavedVariables: XToLevelDB
+## SavedVariablesPerCharacter: sConfig,sData
+## X-Curse-Packaged-Version: 8.1.5
+## X-Curse-Project-Name: XToLevel Future
+## X-Curse-Project-ID: xto-level-Future
+## X-Curse-Repository-ID: wow/xto-level-future/mainline
+
+embeds.xml
+
+locale\locale.xml
+
+Main.lua
+Tables.lua
+Libs.lua
+Config.lua
+
+objects\Messages.lua
+objects\LDB.lua
+objects\Tooltip.lua
+objects\Average.lua
+objects\Player.lua
+
+frames\GlobalTemplates.xml
+frames\AverageFrame_Classic.xml
+frames\AverageFrame_Blocky.xml
