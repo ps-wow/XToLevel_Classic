@@ -26,7 +26,6 @@ XToLevel.timer = LibStub:GetLibrary("AceTimer-3.0")
 -- Member variables
 XToLevel.playerHasXpLossRequest = false
 XToLevel.playerHasResurrectRequest = false
-XToLevel.hasLfgProposalSucceeded = false
 XToLevel.onUpdateTotal = 0
 
 XToLevel.questCompleteDialogOpen = false;
@@ -35,10 +34,6 @@ XToLevel.questCompleteDialogLastOpen = 0
 XToLevel.gatheringAction = nil;
 XToLevel.gatheringTarget = nil;
 XToLevel.gatheringTime = nil;
-
-XToLevel.petBattleClosed = nil;
-
-XToLevel.surveyFoundComplete = nil;
 
 ---
 -- Temporary variables
@@ -77,8 +72,6 @@ function XToLevel:MainOnEvent(event, ...)
         self:OnResurrectRequest();
     elseif event == "PLAYER_ALIVE" then
         self:OnPlayerAlive()
-    elseif event == "LFG_PROPOSAL_SUCCEEDED" then
-    	self:OnLfgProposalSucceeded()
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		self:OnEquipmentChanged(select(1, ...), select(2, ...))
 	elseif event == "TIME_PLAYED_MSG" then
@@ -95,10 +88,6 @@ function XToLevel:MainOnEvent(event, ...)
         self:OnCombatLogEventUnfiltered(...)
     elseif event == "PLAYER_REGEN_ENABLED" then
         self:OnPlayerRegenEnabled()
-    elseif event == "PET_BATTLE_OVER" then
-        self:OnPetBattleOver()
-    elseif event == "ARCHAEOLOGY_FIND_COMPLETE" then
-        XToLevel.surveyFoundComplete = time()
     end
 end
 XToLevel.frame:SetScript("OnEvent", function(self, ...) XToLevel:MainOnEvent(...) end);
@@ -133,13 +122,9 @@ function XToLevel:RegisterEvents(level)
 	    self.frame:RegisterEvent("RESURRECT_REQUEST");
 	    self.frame:RegisterEvent("CONFIRM_SUMMON");
 	    self.frame:RegisterEvent("PLAYER_ALIVE");
-	    self.frame:RegisterEvent("LFG_PROPOSAL_SUCCEEDED")
 		self.frame:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
 		
 		self.frame:RegisterEvent("TIME_PLAYED_MSG")
-        
-        --self.frame:RegisterEvent("GUILD_XP_UPDATE")
-        --self.frame:RegisterEvent("PLAYER_GUILD_UPDATE")
         
         self.frame:RegisterEvent("QUEST_FINISHED")
         self.frame:RegisterEvent("QUEST_COMPLETE")
@@ -148,10 +133,6 @@ function XToLevel:RegisterEvents(level)
         self.frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         self.frame:RegisterEvent("PLAYER_REGEN_ENABLED")
         self.frame:RegisterEvent("PLAYER_REGEN_DISABLED")
-        
-        self.frame:RegisterEvent("PET_BATTLE_OVER");
-        
-        self.frame:RegisterEvent("ARCHAEOLOGY_FIND_COMPLETE");
     end
     
     -- Register slash commands
@@ -182,22 +163,14 @@ function XToLevel:UnregisterEvents()
     self.frame:UnregisterEvent("RESURRECT_REQUEST");
     self.frame:UnregisterEvent("CONFIRM_SUMMON");
     self.frame:UnregisterEvent("PLAYER_ALIVE");
-    self.frame:UnregisterEvent("LFG_PROPOSAL_SUCCEEDED")
 	self.frame:UnregisterEvent("PLAYER_EQUIPMENT_CHANGED")
 	
 	self.frame:UnregisterEvent("TIME_PLAYED_MSG")
-    
-    --self.frame:UnregisterEvent("GUILD_XP_UPDATE")
-    --self.frame:UnregisterEvent("PLAYER_GUILD_UPDATE")
     
     self.frame:UnregisterEvent("PLAYER_TARGET_CHANGED")
     self.frame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     self.frame:UnregisterEvent("PLAYER_REGEN_ENABLED")
     self.frame:UnregisterEvent("PLAYER_REGEN_DISABLED")
-    
-    self.frame:UnregisterEvent("PET_BATTLE_OVER");
-    
-    self.frame:UnregisterEvent("ARCHAEOLOGY_FIND_COMPLETE");
 end
 
 --- PLAYER_LOGIN callback. Initializes the config, locale and c Objects.
@@ -414,7 +387,6 @@ end
 function XToLevel:OnChatXPGain(message)
     -- If the quest dialog was open in the last 2 seconds, assume this is a quest reward.
     local isQuest = self.questCompleteDialogOpen or (GetTime() - self.questCompleteDialogLastOpen) < 2
-    local isArch = self.surveyFoundComplete ~= nil and self.surveyFoundComplete + 30 >= time();
     local xp, mobName = XToLevel.Lib:ParseChatXPMessage(message, isQuest)
     xp = tonumber(xp)
 	if not xp then
@@ -488,16 +460,6 @@ function XToLevel:OnChatXPGain(message)
                         XToLevel.Messages.Chat:PrintQuest(questsRequired)
                     end
                 end
-            elseif isArch then
-                XToLevel.surveyFoundComplete = nil
-                XToLevel.Player:AddDig(xp)
-                if XToLevel.db.profile.messages.playerFloating or XToLevel.db.profile.messages.playerChat then
-                    local digsRequired = XToLevel.Player:GetQuestsRequired(xp) -- Exact digs and quests remaining are calculated the same way.
-                    if digsRequired > 0 then
-                        XToLevel.Messages.Floating:PrintDig(digsRequired)
-                        XToLevel.Messages.Chat:PrintDig(digsRequired)
-                    end
-                end
             else
                 if XToLevel.gatheringTarget ~= nil and XToLevel.gatheringTime ~= nil and GetTime() - XToLevel.gatheringTime < 5 then
                     XToLevel.Player:AddGathering(XToLevel.gatheringAction, XToLevel.gatheringTarget, xp);
@@ -509,14 +471,6 @@ function XToLevel:OnChatXPGain(message)
                     XToLevel.gatheringTarget = nil;
                     XToLevel.gatheringAction = nil;
                     XToLevel.gatheringTime = nil;
-                elseif XToLevel.petBattleOver ~= nil and GetTime() - XToLevel.petBattleOver < 5 then
-                    local remaining = XToLevel.Player:GetPetBattlesRequired(xp) - 1
-                    if type(remaining) == "number" and remaining > 0 then
-                        XToLevel.Player:AddPetBattle(xp)
-                        XToLevel.Messages.Floating:PrintKill(L["Battles Like That"], remaining)
-                        XToLevel.Messages.Chat:PrintKill(L["Battles Like That"], remaining)
-                    end
-                    XToLevel.petBattleOver = nil
                 else
                     -- This estimate is made before the XP is updated, so -1 to compensate.
                     local remaining = XToLevel.Player:GetQuestsRequired(xp) - 1
@@ -587,14 +541,6 @@ function XToLevel:OnPlayerEnteringBattleground()
 	end
 end
 
---- LFG_PROPOSAL_SUCCEEDED callback.
--- Called when all members of a PUG, assembled via the LFG system, have accepted
--- the invite. (Used here to detect whether a player is entering a dungeon
--- whiles inside another one.)
-function XToLevel:OnLfgProposalSucceeded()
-	self.hasLfgProposalSucceeded = true
-end
-
 --- PLAYER_LEAVING_Instance callback.
 function XToLevel:PlayerLeavingInstance(force)
     if force == true or (XToLevel.Player:IsDungeonInProgress() and (not UnitIsDeadOrGhost("player"))) then
@@ -626,14 +572,6 @@ end
 -- the "bgs required" message. It also checks if the player has entered or
 -- left an instance and calls the appropriate functions.
 function XToLevel:OnPlayerEnteringWorld()
-	if self.hasLfgProposalSucceeded then
-		local inInstance, type = IsInInstance()
-		if XToLevel.Player:IsDungeonInProgress() and inInstance and type == "party" then
-            self:PlayerLeavingInstance()
-            XToLevel.Player:DungeonStart()
-		end
-		self.hasLfgProposalSucceeded = false
-	end
     if GetRealZoneText() ~= "" then
 	    -- GetRealZoneText is set to an empty string the first time this even fires,
 	    -- making IsInBattleground return a false negative when actually in bg.
@@ -759,13 +697,6 @@ function XToLevel:TimePlayedTriggerCallback()
 end
 
 --------------------------------------------------------------------------------
--- Pet Battle
---------------------------------------------------------------------------------  
-function XToLevel:OnPetBattleOver()
-    XToLevel.petBattleOver = GetTime()
-end
-
---------------------------------------------------------------------------------
 -- SLASH command stuff
 --------------------------------------------------------------------------------
 
@@ -785,13 +716,6 @@ function XToLevel:OnSlashCommand(arg1)
 		XToLevel.Player:ClearQuestList()
 		XToLevel.Player.questAverage = nil
 		XToLevel.Messages:Print("Player quests records cleared.")
-		XToLevel.Average:Update()
-        XToLevel.LDB:BuildPattern();
-		XToLevel.LDB:Update()
-    elseif arg1 == "clear battles" then
-		XToLevel.Player:ClearPetBattles()
-		XToLevel.Player.petBattleAverage = nil
-		XToLevel.Messages:Print("Player pet battles records cleared.")
 		XToLevel.Average:Update()
         XToLevel.LDB:BuildPattern();
 		XToLevel.LDB:Update()
@@ -831,11 +755,6 @@ function XToLevel:OnSlashCommand(arg1)
             console:log("  totalXP: ".. tostring(data.totalXP))
             console:log("  killCount: ".. tostring(data.killCount))
             console:log("  killTotal: ".. tostring(data.killTotal))
-        end
-    elseif arg1 == "pblist" then
-        console:log("-- Pet Battle list--")
-        for index, xpValue in ipairs(XToLevel.db.char.data.petBattleList) do
-            console:log("#" .. tostring(index) .. ": " .. tostring(xpValue))
         end
     elseif arg1 == "glist" then
 		for action, actionTable in pairs(XToLevel.db.char.data.gathering) do
