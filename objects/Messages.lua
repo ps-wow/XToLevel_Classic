@@ -72,23 +72,6 @@ end
 
 ---
 -- function description
-function XToLevel.Messages.Floating:PrintBattleground(bgsRequired)
-    if XToLevel.db.profile.messages.playerFloating then
-        local message = bgsRequired .. L["Battlegrounds Needed"]
-        self:Print(message, XToLevel.db.profile.messages.colors.playerBattleground, self.questStyle)
-    end
-end
----
--- function description
-function XToLevel.Messages.Floating:PrintBGObjective(bgsRequired)
-    if XToLevel.db.profile.messages.playerFloating and XToLevel.db.profile.messages.bgObjectives then
-        local message = bgsRequired .. L["Battleground Objectives Needed"]
-        self:Print(message, XToLevel.db.profile.messages.colors.playerBattleground, self.questStyle)
-    end
-end
-
----
--- function description
 function XToLevel.Messages.Floating:PrintDungeon(remaining)
     if XToLevel.db.profile.messages.playerFloating then
         local message = remaining .. L["Dungeons Needed"]
@@ -139,23 +122,6 @@ function XToLevel.Messages.Chat:PrintAnonymous(questsRequired)
     if XToLevel.db.profile.messages.playerChat then
         local message = questsRequired .. L["Anonymous Needed"]
         XToLevel.Messages:Print(message, self.questStyle, XToLevel.db.profile.messages.colors.playerQuest)
-    end
-end
-
----
--- function description
-function XToLevel.Messages.Chat:PrintBattleground(bgsRequired)
-    if XToLevel.db.profile.messages.playerChat then
-        local message = bgsRequired .. L["Battlegrounds Needed"]
-        XToLevel.Messages:Print(message, self.questStyle, XToLevel.db.profile.messages.colors.playerBattleground)
-    end
-end
----
--- function description
-function XToLevel.Messages.Chat:PrintBGObjective(bgsRequired)
-    if XToLevel.db.profile.messages.playerChat and XToLevel.db.profile.messages.bgObjectives then
-        local message = bgsRequired .. L["Battleground Objectives Needed"]
-        XToLevel.Messages:Print(message, self.questStyle, XToLevel.db.profile.messages.colors.playerBattleground)
     end
 end
 

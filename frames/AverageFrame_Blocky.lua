@@ -18,44 +18,29 @@ XToLevel.AverageFrameAPI["Blocky"] =
 
     --- Called when the frame first loads
     Initialize = function(self)
-	    local iconName = (UnitFactionGroup("player") == "Alliance") and "battle_ally_icon.tga" or "battle_horde_icon.tga"
-	    XToLevel_AverageFrame_Blocky_PlayerFrameCounterBattlesIcon:SetTexture("Interface\\AddOns\\XToLevel_Classic\\textures\\" .. iconName)
-        
         -- Fetch boxes
         self.playerBoxes = {
-	        {   
+	        {
 	            name =  'XToLevel_AverageFrame_Blocky_PlayerFrameCounterKills',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterKills,
 	            visible = XToLevel.db.profile.averageDisplay.playerKills
 	        },
-	        {   
+	        {
 	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterQuests',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterQuests,
 	            visible = XToLevel.db.profile.averageDisplay.playerQuests
 	        },
-	        {   
+	        {
 	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterDungeons',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterDungeons,
 	            visible = XToLevel.db.profile.averageDisplay.playerDungeons
 	        },
-	        {   name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterBattles',
-	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterBattles,
-	            visible = XToLevel.db.profile.averageDisplay.playerBGs
-	        },
-	        {   name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterObjectives',
-	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterObjectives,
-	            visible = XToLevel.db.profile.averageDisplay.playerBGOs
-	        },
-	        {   name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterGathering',
-	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterGathering,
-	            visible = XToLevel.db.profile.averageDisplay.playerGathering
-	        },
-	        {   
+	        {
 	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgress',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgress,
 	            visible = XToLevel.db.profile.averageDisplay.playerProgress
 	        },
-	        {   
+	        {
 	            name = 'XToLevel_AverageFrame_Blocky_PlayerFrameCounterTimer',
 	            ref =   XToLevel_AverageFrame_Blocky_PlayerFrameCounterTimer,
 	            visible = XToLevel.db.profile.averageDisplay.playerTimer
@@ -176,17 +161,13 @@ XToLevel.AverageFrameAPI["Blocky"] =
         self.playerBoxes[1]["visible"] = XToLevel.db.profile.averageDisplay.playerKills
         self.playerBoxes[2]["visible"] = XToLevel.db.profile.averageDisplay.playerQuests
         self.playerBoxes[3]["visible"] = XToLevel.db.profile.averageDisplay.playerDungeons and XToLevel.Player.level >= 15
-        self.playerBoxes[4]["visible"] = XToLevel.db.profile.averageDisplay.playerBGs and XToLevel.Player.level >= 10
-        self.playerBoxes[5]["visible"] = XToLevel.db.profile.averageDisplay.playerBGOs and XToLevel.Player.level >= 10
-        self.playerBoxes[6]["visible"] = XToLevel.db.profile.averageDisplay.playerPetBattles and XToLevel.Player:HasPetBattleInfo()
-        self.playerBoxes[7]["visible"] = XToLevel.db.profile.averageDisplay.playerGathering and XToLevel.Player:HasGatheringInfo()
-        self.playerBoxes[8]["visible"] = XToLevel.db.profile.averageDisplay.playerProgress
-		self.playerBoxes[9]["visible"] = XToLevel.db.profile.averageDisplay.playerTimer and XToLevel.db.profile.averageDisplay.playerTimer
-    
+        self.playerBoxes[4]["visible"] = XToLevel.db.profile.averageDisplay.playerProgress
+        self.playerBoxes[5]["visible"] = XToLevel.db.profile.averageDisplay.playerTimer and XToLevel.db.profile.averageDisplay.playerTimer
+
         local orientation = XToLevel.db.profile.averageDisplay.orientation or 'v'
         self:StackBoxes(orientation, self.playerBoxes, XToLevel_AverageFrame_Blocky_PlayerFrame, 'XToLevel_AverageFrame_Blocky_PlayerFrame');
     end,
-    
+
     ---
     -- Stacks the boxes.
     -- @param direction Either "h" for horizontal or "v" for vertical.
@@ -214,8 +195,7 @@ XToLevel.AverageFrameAPI["Blocky"] =
                 values.ref:Hide()
             end
         end
-        
-        
+
         if direction == 'h' then
             container:SetWidth(xcurr)
             container:SetHeight(ymax)
@@ -223,9 +203,8 @@ XToLevel.AverageFrameAPI["Blocky"] =
             container:SetWidth(xmax)
             container:SetHeight(-ycurr)
         end
-        
     end,
-    
+
     --- Called each time an event is fired.
     OnEvent = function(self)
         return true
@@ -254,11 +233,6 @@ XToLevel.AverageFrameAPI["Blocky"] =
     --- Sets the objectives value for the frame
     SetObjectives = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterObjectivesValueText:SetText(tonumber(value))
-    end,
-
-    --- Sets the gathering average
-    SetGathering = function(self, value)
-        XToLevel_AverageFrame_Blocky_PlayerFrameCounterGatheringValueText:SetText(tonumber(value))
     end,
 
     --- Sets the value for the progress bar.
@@ -290,13 +264,13 @@ XToLevel.AverageFrameAPI["Blocky"] =
             progressText:SetTextColor(rgb.r, rgb.g, rgb.b, 1.0)
         end
     end,
-	
-	SetTimer = function(self, shortTimeString, longTimeString)
-		if type(shortTimeString) == "string" then
-			XToLevel_AverageFrame_Blocky_PlayerFrameCounterTimerValueText:SetText(shortTimeString)
-		end
-	end,
-    
+
+    SetTimer = function(self, shortTimeString, longTimeString)
+        if type(shortTimeString) == "string" then
+            XToLevel_AverageFrame_Blocky_PlayerFrameCounterTimerValueText:SetText(shortTimeString)
+        end
+    end,
+
     --- Sets whether or not to hide the XToLevel header.
     HeaderVisible = function(self, value)
         local header = XToLevel_AverageFrame_Blocky_PlayerFrameLabel
@@ -310,7 +284,6 @@ XToLevel.AverageFrameAPI["Blocky"] =
                 -- Move Progress bar
                 XToLevel_AverageFrame_Blocky_PlayerFrameProgress:ClearAllPoints()
                 XToLevel_AverageFrame_Blocky_PlayerFrameProgress:SetPoint("TOPLEFT", XToLevel_AverageFrame_Blocky_PlayerFrame, "TOPLEFT", 15, -37);
-                
             else
                 XToLevel_AverageFrame_Blocky_PlayerFrameLabel:Hide()
                 XToLevel_AverageFrame_Blocky_PlayerFrame:SetHeight(39)

@@ -16,8 +16,6 @@ This is a simplified version, which is good for creating simple patterns.
 Availble tags:
 * <kills> - The amount of kills a player needs to level.
 * <quests> - The amount of quests a player needs to level.
-* <bgs> - The amount of battlegrounds a player needs to level.
-* <bgo> - The amount of battleground objectives a player needs to level.
 * <xp> - The percentage or the number of bars of XP gained or remaining for the current level.
 * <xpnum> - The XP gained or remaining for the current level.
 * <rested> - The EXTRA experience you will collect for mob kills.
@@ -56,8 +54,6 @@ Disabling the parent tag in the in-game configuration will also disable any nest
 Available tags are:
 * {kills} - The amount of kills a player needs to level.
 * {quests} - The amount of quests a player needs to level.
-* {bgs} - The amount of battlegrounds a player needs to level.
-* {bgo} - The amount of battleground objectives a player needs to level.
 * {xp} - The percentage or the number of bars of XP gained or remaining for the current level.
 * {xpnum} The XP gained or remaining for the current level.
 * {timer} - The estimated time remaining until you reach your next level, based on your current XP per hour.
@@ -77,8 +73,8 @@ Example:
  - {kills}{$seperator: }{color=FF0000}{$label}:{/color} {progress}{$value}{/progress}{/kills}
  
 These are the built in patterns.
- - Default:  {kills}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/kills}{quests}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/quests}{bgs}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/bgs}{xp}{$seperator: }{progress}[{$value}]{/progress}{/xp}
- - minimal: {kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/quests}{bgs}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/bgs}{xp}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/xp}
- - minimal_dashed: {kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/quests}{bgs}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/bgs}{xp}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/xp}
- - brackets: {kills}{progress}[{$value}]{/progress}{/kills}{quests}{progress}[{$value}]{/progress}{/quests}{bgs}{progress}[{$value}]{/progress}{/bgs}{xp}{progress}[{$value}]{/progress}{/xp}
+ - Default:  {kills}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/kills}{quests}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/quests}{xp}{$seperator: }{progress}[{$value}]{/progress}{/xp}
+ - minimal: {kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/quests}{xp}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/xp}
+ - minimal_dashed: {kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/quests}{xp}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/xp}
+ - brackets: {kills}{progress}[{$value}]{/progress}{/kills}{quests}{progress}[{$value}]{/progress}{/quests}{xp}{progress}[{$value}]{/progress}{/xp}
  - countdown: {xpnum}{color=cfcfdf}XP:{/color}{$seperator: }{progress}{$value}{/progress}{xp} {color=cfcfdf}({/color}{progress}{$value}{/progress}{color=cfcfdf}){/color}{/xp}{$seperator: }{/xpnum}{rested}{color=cfcfdf}R:{/color}{$seperator: }{progress}{$value}{/progress} {restedp}{color=cfcfdf}({/color}{progress}{$value}{/progress}{color=cfcfdf}){/color}{/restedp}{$seperator: }{/rested}

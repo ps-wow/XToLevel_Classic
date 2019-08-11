@@ -23,7 +23,6 @@
    ShrinkNumber(input) - Shrinks a number to a smaller format. (E.g. 1234000 = 1,23M)
    DecToHex(input) - Converts a decimal (base 10) number to a hex (base 16) number.
    GetProgressColor(percent) - Gets a color value to represent the given progress. (Green for 100%, red for 0%)
-   GetBGObjectiveMinXP() - Gets the minimum amount of XP that would be considered a valid BG objective reward.
    FindAnchor(frame) - Gets the appropriate tooltip anchor point for the give frame. (E.g. "TOPLEFT", "BOTTOMRIGHT")
    Split(str, delim, maxNb) - Splits the str on the delim char, maxNb number of times.
 --]]
@@ -499,36 +498,6 @@ end
 
 function XToLevel.Lib:GetDifficoultyColor(levelDifference)
     
-end
-
----
--- Gets the minimum amount of XP that would be considered a valid BG objective reward.
----
-function XToLevel.Lib:GetBGObjectiveMinXP()
-	if XToLevel.Player.level > 10 then
-		local bgMin = {
-			["Alterac Valley"] = 750,
-			["Isle of Conquest"] = 250,
-			["Strand of the Anchients"] = 500,
-			["Eye of the Storm"] = 500,
-			["Arathi Basin"] = 250,
-			["Warsong Gulch"] = 250,
-		}
-		local zone = GetRealZoneText()
-		local zoneMin = 500
-		
-		for name, value in pairs(bgMin) do
-			if name == zone then
-				zoneMin = value
-			end
-		end
-		
-		local playerMultiplier = (XToLevel.Player.level - 10) / (XToLevel.Player.maxLevel - 10)
-		
-		return (XToLevel.Lib:round(zoneMin * playerMultiplier, 0))
-	else
-		return 0
-	end
 end
 
 ---

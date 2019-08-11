@@ -153,16 +153,6 @@ XToLevel.AverageFrameAPI["Classic"] =
         else
             self.lines.playerDungeons:Show()
         end
-        if not XToLevel.Player.isActive or (XToLevel.Player:GetAverageBGsRemaining() == nil or not XToLevel.Lib:ShowBattlegroundData()) then
-            self.lines.playerBGs:Hide()
-        else
-            self.lines.playerBGs:Show()
-        end
-        if not XToLevel.Player.isActive or (XToLevel.Player:GetAverageBGObjectivesRemaining() == nil or not XToLevel.Lib:ShowBattlegroundData()) then
-            self.lines.playerBGOs:Hide()
-        else
-            self.lines.playerBGOs:Show()
-        end
         
         if XToLevel.Player.isActive and XToLevel.db.profile.averageDisplay.progress then
             self.lines.playerProgress:Show()
@@ -174,12 +164,6 @@ XToLevel.AverageFrameAPI["Classic"] =
             self.lines.playerTimer:Show()
         else
             self.lines.playerTimer:Hide()
-        end
-
-        if XToLevel.Player.isActive and XToLevel.db.profile.averageDisplay.playerGathering and XToLevel.Player:HasGatheringInfo() then
-            self.lines.playerGathering:Show()
-        else
-            self.lines.playerGathering:Hide()
         end
     end,
     
@@ -283,9 +267,6 @@ XToLevel.AverageFrameAPI["Classic"] =
         self:CreateLine('playerKills', 'player', 2, 'kills', L["Kills"], 'XToLevel_span')
         self:CreateLine('playerQuests', 'player', 3, 'quests', L["Quests"], 'XToLevel_span')
         self:CreateLine('playerDungeons', 'player', 4, 'dungeons', L["Dungeons"], 'XToLevel_span')
-        self:CreateLine('playerBGs', 'player', 5, 'bg', L["Battles"], 'XToLevel_span')
-        self:CreateLine('playerBGOs', 'player', 6, 'bg', L["Objectives"], 'XToLevel_span')
-        self:CreateLine('playerGathering', 'player', 8, 'gathering', L["Gathering"], 'XToLevel_span')
         self:CreateLine('playerProgress', 'player', 10, 'experience', L["XP Percent"], 'XToLevel_span')
         self:CreateLine('playerTimer', 'player', 11, 'timer', L["Player Timer"], "XToLevel_span")
     end,
@@ -343,16 +324,6 @@ XToLevel.AverageFrameAPI["Classic"] =
         self:WriteToLine("playerDungeons", "Dungeons", value, self:GetTextColor("player"))
     end,
 
-    --- Sets the battle value for the frame
-    SetBattles = function(self, value)
-        self:WriteToLine("playerBGs", "Battles", value, self:GetTextColor("player"))
-    end,
-
-    --- Sets the objectives value for the frame
-    SetObjectives = function(self, value)
-        self:WriteToLine("playerBGOs", "Objectives", value, self:GetTextColor("player"))
-    end,
-
     --- Sets the value for the progress bar.
     -- Changes both the progress bar and the text.
     SetProgress = function(self, percent)
@@ -367,10 +338,5 @@ XToLevel.AverageFrameAPI["Classic"] =
     --- Sets the timer value.
     SetTimer = function(self, shortValue, longValue)
         self:WriteToLine("playerTimer", "Timer", longValue, self:GetTextColor("player"))
-    end,
-
-    --- Sets the gathering value.
-    SetGathering = function(self, value)
-        self:WriteToLine("playerGathering", "Gathering", value, self:GetTextColor("player"))
     end,
 }

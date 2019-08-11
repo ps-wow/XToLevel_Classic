@@ -12,23 +12,20 @@ local L = addonTable.GetLocale()
 XToLevel.LDB = {
     -- Constants
     textPatterns = {
-        default = "{kills}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/kills}{quests}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/quests}{dungeons}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/dungeons}{bgs}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/bgs}{bgo}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/bgo}{gather}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/gather}{xp}{$seperator: }{progress}[{$value}]{/progress}{/xp}",
-        minimal = "{kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/quests}{dungeons}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/dungeons}{bgs}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/bgs}{xp}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/xp}",
-        minimal_dashed = "{kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/quests}{dungeons}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/dungeons}{bgs}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/bgs}{xp}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/xp}",
-        brackets = "{kills}{progress}[{$value}]{/progress}{/kills}{quests}{progress}[{$value}]{/progress}{/quests}{dungeons}{progress}[{$value}]{/progress}{/dungeons}{bgs}{progress}[{$value}]{/progress}{/bgs}{xp}{progress}[{$value}]{/progress}{/xp}",
+        default = "{kills}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/kills}{quests}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/quests}{dungeons}{$seperator: }{color=cfcfdf}{$label}:{/color} {progress}{$value}{/progress}{/dungeons}{xp}{$seperator: }{progress}[{$value}]{/progress}{/xp}",
+        minimal = "{kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/quests}{dungeons}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/dungeons}{xp}{color=cfcfdf}{$seperator:/}{/color}{progress}{$value}{/progress}{/xp}",
+        minimal_dashed = "{kills}{progress}{$value}{/progress}{/kills}{quests}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/quests}{dungeons}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/dungeons}{xp}{color=cfcfdf}{$seperator:-}{/color}{progress}{$value}{/progress}{/xp}",
+        brackets = "{kills}{progress}[{$value}]{/progress}{/kills}{quests}{progress}[{$value}]{/progress}{/quests}{dungeons}{progress}[{$value}]{/progress}{/dungeons}{xp}{progress}[{$value}]{/progress}{/xp}",
 		countdown = "{xpnum}{color=cfcfdf}XP:{/color}{$seperator: }{progress}{$value}{/progress}{xp} {color=cfcfdf}({/color}{progress}{$value}{/progress}{color=cfcfdf}){/color}{/xp}{$seperator: }{/xpnum}{rested}{color=cfcfdf}R:{/color}{$seperator: }{progress}{$value}{/progress} {restedp}{color=cfcfdf}({/color}{progress}{$value}{/progress}{color=cfcfdf}){/color}{/restedp}{$seperator: }{/rested}",
     },
     textTags = {
         [1] = { tag = "kills", label = 'init', value = '~', color = nil, },
         [2] = { tag = "quests", label = 'init', value = '~', color = nil, },
         [3] = { tag = "dungeons", label = 'init', value = '~', color = nil, },
-        [4] = { tag = "bgs", label = 'init', value = '~', color = nil, },
-        [5] = { tag = "bgo", label = 'init', value = '~', color = nil, },
-        [6] = { tag = "gather", label = 'init', value = '~', color = nil, },
-        [7] = { tag = "xp", label = 'init', value = '~', color = nil, },
-        [8] = { tag = "restedp", label = 'init', value = '~', color = nil, },
-        [9] = { tag = "rested", label = 'init', value = '~', color = nil, },
-        [10] = { tag = "xpnum", label = 'init', value = '~', color = nil, },
+        [4] = { tag = "xp", label = 'init', value = '~', color = nil, },
+        [5] = { tag = "restedp", label = 'init', value = '~', color = nil, },
+        [6] = { tag = "rested", label = 'init', value = '~', color = nil, },
+        [7] = { tag = "xpnum", label = 'init', value = '~', color = nil, },
     },
 
     -- Members
@@ -203,42 +200,24 @@ function XToLevel.LDB:BuildPattern()
                 color = (useColors and '$$playercolor$$') or nil,
             }, 
             [4] = { 
-                tag = "bgs",
-                label = (XToLevel.db.profile.ldb.text.verbose and L["Battles"] ) or L["Battles Short"],
-                value = ((showPlayer and UnitLevel("Player") >= 10) and '$$bgs$$') or nil,
-                color = (useColors and '$$playercolor$$') or nil,
-            }, 
-            [5] = { 
-                tag = "bgo",
-                label = (XToLevel.db.profile.ldb.text.verbose and L["Objectives"] ) or L["Objectives Short"],
-                value = ((showPlayer and UnitLevel("Player") >= 10) and '$$bgo$$') or nil,
-                color = (useColors and '$$playercolor$$') or nil,
-            }, 
-            [6] = { 
-                tag = "gather",
-                label = (XToLevel.db.profile.ldb.text.verbose and L["Gathering"] ) or L["Gathering Short"],
-                value = (showPlayer and '$$gather$$') or nil,
-                color = (useColors and '$$playercolor$$') or nil,
-            }, 
-            [7] = { 
                 tag = "xp",
                 label = L["XP"],
                 value = (showPlayer and ('$$xp$$')) or nil,
                 color = (XToLevel.db.profile.ldb.allowTextColor and '$$playercolor$$') or nil,
             },
-            [8] = { 
+            [5] = { 
                 tag = "restedp",
                 label =(XToLevel.db.profile.ldb.text.verbose and L["Rested"] ) or L["Rested Short"],
                 value = (showPlayer and '$$restedp$$') or nil,
                 color = (XToLevel.db.profile.ldb.allowTextColor and '$$playercolor$$') or nil,
             },
-            [9] = { 
+            [6] = { 
                 tag = "rested",
                 label = (XToLevel.db.profile.ldb.text.verbose and L["Rested"] ) or L["Rested Short"],
                 value = (showPlayer and '$$rested$$') or nil,
                 color = (useColors and '$$playercolor$$') or nil,
             },
-            [10] = { 
+            [7] = { 
                 tag = "xpnum",
                 label = (XToLevel.db.profile.ldb.text.verbose and L["XP"] ) or L["XP"],
                 value = (showPlayer and '$$xpnum$$') or nil,
@@ -346,12 +325,6 @@ function XToLevel.LDB:Update()
             xpnum = XToLevel.db.profile.ldb.text.xpnumFormat and XToLevel.Lib:ShrinkNumber(xpnum) or XToLevel.Lib:round(xpnum)
             pattern = string.gsub(pattern, '%$%$xpnum%$%$', xpnum);
 
-            pattern = string.gsub(pattern, '%$%$bgs%$%$', (XToLevel.Lib:round(XToLevel.Player:GetAverageBGsRemaining()) or "~"));
-            pattern = string.gsub(pattern, '%$%$bgo%$%$', (XToLevel.Lib:round(XToLevel.Player:GetAverageBGObjectivesRemaining()) or "~"));
-            
-            local gethering = XToLevel.Player:GetAverageGatheringRequired();
-            pattern = string.gsub(pattern, '%$%$gather%$%$', (XToLevel.Lib:round(gethering) or "~"));
-
             if XToLevel.db.profile.ldb.text.xpnumFormat then
                 pattern = string.gsub(pattern, '%$%$rested%$%$', (XToLevel.Lib:ShrinkNumber(XToLevel.Player.restedXP) or "~"));
             else
@@ -370,9 +343,6 @@ function XToLevel.LDB:Update()
             pattern = string.gsub(pattern, '%$%$dungeons%$%$', '');
             pattern = string.gsub(pattern, '%$%$xp%$%$', '');
             pattern = string.gsub(pattern, '%$%$xpnum%$%$', '');
-            pattern = string.gsub(pattern, '%$%$bgs%$%$', '');
-            pattern = string.gsub(pattern, '%$%$bgo%$%$', '');
-            pattern = string.gsub(pattern, '%$%$gather%$%$', '');
             pattern = string.gsub(pattern, '%$%$rested%$%$', '');
             pattern = string.gsub(pattern, '%$%$restedp%$%$', '');
         end

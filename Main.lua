@@ -31,10 +31,6 @@ XToLevel.onUpdateTotal = 0
 XToLevel.questCompleteDialogOpen = false;
 XToLevel.questCompleteDialogLastOpen = 0
 
-XToLevel.gatheringAction = nil;
-XToLevel.gatheringTarget = nil;
-XToLevel.gatheringTime = nil;
-
 ---
 -- Temporary variables
 local targetList = { }
@@ -365,18 +361,6 @@ function XToLevel:OnPlayerLevelUp(newLevel)
 	XToLevel.LDB:Update();
 end
 
---- Used to handle Gathering profession XP gains. This stores the info so the
--- CHAT_MSG_COMBAT_XP_GAIN can direct the XP gain in the right direction.
--- 
-function XToLevel:OnChatMsgOpening(message)
-    local regexp = string.gsub(OPEN_LOCK_SELF, "%%%d?%$?s", "(.+)")
-    local action, target = strmatch(message, regexp)
-    
-    XToLevel.gatheringAction = action;
-    XToLevel.gatheringTarget = target;
-    XToLevel.gatheringTime = GetTime();
-end
-
 --- CHAT_XP_GAIN callback. Triggered whenever a XP message is displayed in the chat 
 -- window, indicating that the player has gained XP (both kill, quest and BG objectives).
 -- Parses the message and updates the XToLevel.Player and XToLevel.Display objects according 
@@ -419,8 +403,7 @@ function XToLevel:OnChatXPGain(message)
             if not found then
                 targetUpdatePending = unrestedXP;
             end
-            
-			-- XToLevel.db.profile.messages.bgObjectives ???
+
 			if XToLevel.db.profile.messages.playerFloating or XToLevel.db.profile.messages.playerChat then
 				local killsRequired = XToLevel.Player:GetKillsRequired(unrestedXP)
 				if killsRequired > 0 then
@@ -435,57 +418,30 @@ function XToLevel:OnChatXPGain(message)
             end
 		end
     else
-        if XToLevel.Player:IsBattlegroundInProgress() then
-			console:log("Objective XP gained! : " .. tostring(xp))
-			local isObj = XToLevel.Player:AddBattlegroundObjective(xp)
-			if isObj and XToLevel.Player.isActive then
-				local objectivesRequired = XToLevel.Player:GetQuestsRequired(xp)
-				if objectivesRequired > 0 then
-					XToLevel.Messages.Floating:PrintBGObjective(objectivesRequired)
-					XToLevel.Messages.Chat:PrintBGObjective(objectivesRequired)
-				end
-			end
-		else
-            -- Only register as a quest if the quest complete dialog is open.
-            -- (Note, I have not tested the effects of latency on the order of the
-            --  events, so there *may* be a problem in high latency situations.)
-            if isQuest then
-                XToLevel.Player:AddQuest(xp)
-                if XToLevel.db.profile.messages.playerFloating or XToLevel.db.profile.messages.playerChat then
-                    local questsRequired = XToLevel.Player:GetQuestsRequired(xp)
-                    if questsRequired > 0 then
-                        XToLevel.Messages.Floating:PrintQuest( ceil(questsRequired / ( (XToLevel.Lib:IsRafApplied() and 3) or 1 )) )
-                        XToLevel.Messages.Chat:PrintQuest(questsRequired)
-                    end
-                end
-            else
-                if XToLevel.gatheringTarget ~= nil and XToLevel.gatheringTime ~= nil and GetTime() - XToLevel.gatheringTime < 5 then
-                    XToLevel.Player:AddGathering(XToLevel.gatheringAction, XToLevel.gatheringTarget, xp);
-                    local remaining = XToLevel.Player:GetQuestsRequired(xp)
-                    if type(remaining) == "number" and remaining > 0 then
-                        XToLevel.Messages.Floating:PrintKill(XToLevel.gatheringTarget, remaining)
-                        XToLevel.Messages.Chat:PrintKill(XToLevel.gatheringTarget, remaining)
-                    end
-                    XToLevel.gatheringTarget = nil;
-                    XToLevel.gatheringAction = nil;
-                    XToLevel.gatheringTime = nil;
-                else
-                    -- This estimate is made before the XP is updated, so -1 to compensate.
-                    local remaining = XToLevel.Player:GetQuestsRequired(xp) - 1
-                    if type(remaining) == "number" and remaining > 0 then
-                        XToLevel.Messages.Floating:PrintAnonymous(remaining)
-                        XToLevel.Messages.Chat:PrintAnonymous(remaining)
-                    end
+        if isQuest then
+            XToLevel.Player:AddQuest(xp)
+            if XToLevel.db.profile.messages.playerFloating or XToLevel.db.profile.messages.playerChat then
+                local questsRequired = XToLevel.Player:GetQuestsRequired(xp)
+                if questsRequired > 0 then
+                    XToLevel.Messages.Floating:PrintQuest( ceil(questsRequired / ( (XToLevel.Lib:IsRafApplied() and 3) or 1 )) )
+                    XToLevel.Messages.Chat:PrintQuest(questsRequired)
                 end
             end
-		end
+        else
+            -- This estimate is made before the XP is updated, so -1 to compensate.
+            local remaining = XToLevel.Player:GetQuestsRequired(xp) - 1
+            if type(remaining) == "number" and remaining > 0 then
+                XToLevel.Messages.Floating:PrintAnonymous(remaining)
+                XToLevel.Messages.Chat:PrintAnonymous(remaining)
+            end
+        end
     end
 end
 
 --- Callback for the QUEST_COMPLETE event.
 -- Note that this is NOT fired when a quest is completed, but rather when the
 -- player is given the last dialog to complete a quest. This event firing does
--- not mean a quest has been completed! 
+-- not mean a quest has been completed!
 function XToLevel:OnQuestComplete()
     self.questCompleteDialogOpen = true;
 end
@@ -556,28 +512,14 @@ end
 -- left an instance and calls the appropriate functions.
 function XToLevel:OnPlayerEnteringWorld()
     if GetRealZoneText() ~= "" then
-	    -- GetRealZoneText is set to an empty string the first time this even fires,
-	    -- making IsInBattleground return a false negative when actually in bg.
-		if XToLevel.Player:IsBattlegroundInProgress() and not XToLevel.Lib:IsInBattleground() then
-			if XToLevel.Player.isActive then
-				local bgsRequired = XToLevel.Player:GetQuestsRequired(XToLevel.db.char.data.bgList[1].totalXP)
-				XToLevel.Player:BattlegroundEnd()
-				XToLevel.Average:Update()
-		        XToLevel.LDB:BuildPattern();
-				XToLevel.LDB:Update()
-				if bgsRequired > 0 then
-					XToLevel.Messages.Floating:PrintBattleground(bgsRequired)
-					XToLevel.Messages.Chat:PrintBattleground(bgsRequired)
-				end
-			end
-		else
-			local inInstance, type = IsInInstance()
-			if not XToLevel.Player:IsDungeonInProgress() and inInstance and type == "party" then
-	            XToLevel.Player:DungeonStart()
-			elseif not inInstance and XToLevel.Player:IsDungeonInProgress() then
-	            self:PlayerLeavingInstance()
-			end
-		end
+        -- GetRealZoneText is set to an empty string the first time this even fires,
+        -- making IsInBattleground return a false negative when actually in bg.
+        local inInstance, type = IsInInstance()
+        if not XToLevel.Player:IsDungeonInProgress() and inInstance and type == "party" then
+            XToLevel.Player:DungeonStart()
+        elseif not inInstance and XToLevel.Player:IsDungeonInProgress() then
+            self:PlayerLeavingInstance()
+        end
 	end
 end
 
@@ -625,33 +567,7 @@ end
 -- not it checks if the name of the BG matches the zone. If not the player has
 -- left the BG are and the BG in progress is stopped.
 function XToLevel:OnAreaChanged()
-	if XToLevel.Player:IsBattlegroundInProgress() and XToLevel.Player.isActive then
-		local oldZone = XToLevel.db.char.data.bgList[1].name
-		local newZone = GetRealZoneText()
-		if oldZone == false then
-			XToLevel.db.char.data.bgList[1].name = newZone
-			console:log(" - BG name set. ")
-		else
-            if oldZone ~= newZone then
-			    console:log(" - BG names don't match (" .. oldZone .." vs " .. newZone ..").")
-                local bgsRequired = XToLevel.Player:GetQuestsRequired(XToLevel.db.char.data.bgList[1].totalXP)
-                XToLevel.Player:BattlegroundEnd()
-                XToLevel.Average:Update()
-                XToLevel.LDB:BuildPattern();
-                XToLevel.LDB:Update()
-                if bgsRequired > 0 then
-                    XToLevel.Messages.Floating:PrintBattleground(bgsRequired)
-                    XToLevel.Messages.Chat:PrintBattleground(bgsRequired)
-                end
-                if XToLevel.Lib:IsInBattleground() then
-                    console:log(" - Player switched battlegrounds. Starting new.")
-					XToLevel.Player:BattlegroundStart()
-                else
-                    console:log(" - Player not in a battleground. Ending")
-                end
-			end
-		end
-	end
+    -- Removed BG
 end
 
 --------------------------------------------------------------------------------
@@ -702,14 +618,6 @@ function XToLevel:OnSlashCommand(arg1)
 		XToLevel.Average:Update()
         XToLevel.LDB:BuildPattern();
 		XToLevel.LDB:Update()
-	elseif arg1 == "clear bg" then
-		XToLevel.Player:ClearBattlegroundList()
-		XToLevel.Player.bgAverage = nil
-		XToLevel.Player.bgObjAverage = nil
-		XToLevel.Messages:Print("Player battleground records cleared.")
-		XToLevel.Average:Update()
-        XToLevel.LDB:BuildPattern();
-		XToLevel.LDB:Update()
 	elseif arg1 == "clear dungeons" then
         XToLevel.Player:ClearDungeonList()
         XToLevel.Messages:Print("Player dungeon records cleared.")
@@ -727,24 +635,6 @@ function XToLevel:OnSlashCommand(arg1)
             console:log("  rested: ".. tostring(data.rested))
             console:log("  killCount: ".. tostring(data.killCount))
             console:log("  killTotal: ".. tostring(data.killTotal))
-        end
-    elseif arg1 == "blist" then
-        console:log("-- BG list--")
-        for index, data in ipairs(XToLevel.db.char.data.bgList) do
-            console:log("#" .. tostring(index))
-            console:log("  inProgress: ".. tostring(data.inProgress))
-            console:log("  name: ".. tostring(data.name))
-            console:log("  level: ".. tostring(data.level))
-            console:log("  totalXP: ".. tostring(data.totalXP))
-            console:log("  killCount: ".. tostring(data.killCount))
-            console:log("  killTotal: ".. tostring(data.killTotal))
-        end
-    elseif arg1 == "glist" then
-		for action, actionTable in pairs(XToLevel.db.char.data.gathering) do
-            console:log("-- " .. tostring(action) .. " -- ")
-            for i, row in pairs(actionTable) do
-                console:log(" " .. tostring(row["target"]) .. ", l:" .. tostring(row["level"]) .. ", xp:" .. tostring(row["xp"]) .. ", z:" .. tostring(row["zoneID"]) .. ", x" .. tostring(row["count"]));
-            end
         end
     elseif arg1 == "debug" then
         if type(XToLevel.db.char.data.npcXP) == "table" then

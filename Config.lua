@@ -110,20 +110,6 @@ function XToLevel.Config:Initialize()
 	    whileDead = true,
 	    hideOnEscape = true,
 	}
-    StaticPopupDialogs['XToLevelConfig_ResetGathering'] = {
-	    text = L["Reset Gathering Dialog"],
-	    button1 = L["Yes"],
-	    button2 = L["No"],
-	    OnAccept = function()
-	        XToLevel.db.char.data.gathering = { }
-			XToLevel.Average:Update()
-            XToLevel.LDB:BuildPattern();
-			XToLevel.LDB:Update()
-	    end,
-	    timeout = 0,
-	    whileDead = true,
-	    hideOnEscape = true,
-	}
     StaticPopupDialogs['XToLevelConfig_LdbReload'] = {
 	    text = L["LDB Reload Dialog"],
 	    button1 = L["Yes"],
@@ -273,13 +259,6 @@ args = {
                 name = L["Show In Chat"],
                 get = function(info) return XToLevel.db.profile.messages.playerChat end,
                 set = function(info, value) XToLevel.db.profile.messages.playerChat = value end,
-            },
-            playerBG = {
-                order = 3,
-                type = "toggle",
-                name =L["Show BG Objectives"],
-                get = function(info) return XToLevel.db.profile.messages.bgObjectives end,
-                set = function(info, value) XToLevel.db.profile.messages.bgObjectives = value end,
             },
             colorsHeader = {
                 order = 4,
@@ -514,16 +493,6 @@ args = {
                     XToLevel.Average:Update()   
                 end,
             },
-            dataBattleObjectives = {
-                order = 20,
-                type = "toggle",
-                name = L["Player Objectives"],
-                get = function(info) return XToLevel.db.profile.averageDisplay.playerBGOs end,
-                set = function(info, value) 
-                    XToLevel.db.profile.averageDisplay.playerBGOs = value 
-                    XToLevel.Average:Update()   
-                end,
-            },
             dataProgress = {
                 order = 21,
                 type = "toggle",
@@ -541,16 +510,6 @@ args = {
                 get = function(info) return XToLevel.db.profile.averageDisplay.playerTimer end,
                 set = function(info, value) 
                     XToLevel.db.profile.averageDisplay.playerTimer = value 
-                    XToLevel.Average:Update()   
-                end,
-            },
-            dataGathering = {
-                order = 23,
-                type = "toggle",
-                name = L["Gathering"] or "Gathering",
-                get = function(info) return XToLevel.db.profile.averageDisplay.playerGathering end,
-                set = function(info, value) 
-                    XToLevel.db.profile.averageDisplay.playerGathering = value 
                     XToLevel.Average:Update()   
                 end,
             },
@@ -744,17 +703,6 @@ args = {
                     XToLevel.LDB:Update()
                 end,
             },
-            ldbDataObjectives = {
-                order = 20,
-                type = "toggle",
-                name = L["Player Objectives"],
-                get = function(i) return XToLevel.db.profile.ldb.text.bgo end,
-                set = function(i,v) 
-                    XToLevel.db.profile.ldb.text.bgo = v
-                    XToLevel.LDB:BuildPattern()
-                    XToLevel.LDB:Update()
-                end,
-            },
             ldbDataProgress = {
                 order = 21,
                 type = "toggle",
@@ -773,17 +721,6 @@ args = {
                 get = function(i) return XToLevel.db.profile.ldb.text.xpnum end,
                 set = function(i,v) 
                     XToLevel.db.profile.ldb.text.xpnum = v
-                    XToLevel.LDB:BuildPattern()
-                    XToLevel.LDB:Update()
-                end,
-            },
-            ldbDataGathering = {
-                order = 23,
-                type = "toggle",
-                name = L["Gathering"],
-                get = function(i) return XToLevel.db.profile.ldb.text.gather end,
-                set = function(i,v) 
-                    XToLevel.db.profile.ldb.text.gather = v
                     XToLevel.LDB:BuildPattern()
                     XToLevel.LDB:Update()
                 end,
@@ -823,26 +760,6 @@ args = {
                 step = 1,
                 get = function() return XToLevel.db.profile.averageDisplay.playerQuestListLength end,
                 set = function(i,v) XToLevel.Player:SetQuestAverageLength(v) end,
-            },
-            dataRangeBattles = {
-                order = 5,
-                type = "range",
-                name = L["Player Battles"],
-                min = 1,
-                max = 100,
-                step = 1,
-                get = function() return XToLevel.db.profile.averageDisplay.playerBGListLength end,
-                set = function(i,v) XToLevel.Player:SetBattleAverageLength(v) end,
-            },
-            dataRangeObjectives = {
-                order = 6,
-                type = "range",
-                name = L["Player Objectives"],
-                min = 1,
-                max = 100,
-                step = 1,
-                get = function() return XToLevel.db.profile.averageDisplay.playerBGOListLength end,
-                set = function(i,v) XToLevel.Player:SetObjectiveAverageLength(v) end,
             },
             dataRangeDungeons = {
                 order = 7,
@@ -888,12 +805,6 @@ args = {
                 name = L["Reset Battlegrounds"],
                 func = function() StaticPopup_Show("XToLevelConfig_ResetBattles")  end,
             },
-            dataClearGathering = {
-                order = 15,
-                type = "execute",
-                name = L["Reset Gathering"],
-                func = function() StaticPopup_Show("XToLevelConfig_ResetGathering")  end,
-            },
         }
     },
     Tooltip = {
@@ -932,13 +843,6 @@ args = {
                 name = L["Show Dungeon Info"],
                 get = function(i) return XToLevel.db.profile.ldb.tooltip.showDungeonInfo end,
                 set = function(i,v) XToLevel.db.profile.ldb.tooltip.showDungeonInfo = v end,
-            },
-            gatheringInfo = {
-                order = 6,
-                type = "toggle",
-                name = L["Show Gathering Info"],
-                get = function(i) return XToLevel.db.profile.ldb.tooltip.showGatheringInfo end,
-                set = function(i,v) XToLevel.db.profile.ldb.tooltip.showGatheringInfo = v end,
             },
             timerDetails = {
                 order = 8,
@@ -1098,7 +1002,6 @@ function XToLevel.Config:GetDefaults()
             messages = {
 		        playerFloating = true,
 		        playerChat = false,
-		        bgObjectives = true,
 		        colors = {
 			        playerKill = {0.72, 1, 0.71, 1},
 			        playerQuest = {0.5, 1, 0.7, 1},
@@ -1121,17 +1024,12 @@ function XToLevel.Config:GetDefaults()
 		        playerKills = true,
 		        playerQuests = true,
 		        playerDungeons = true,
-		        playerBGs = true,
-		        playerBGOs = false,
-                playerGathering = true,
 		        playerProgress = true,
 		        playerTimer = true,
 		        progress = true, -- Duplicate?
 		        progressAsBars = false,
 		        playerKillListLength = 10,
 		        playerQuestListLength = 10,
-		        playerBGListLength = 15,
-		        playerBGOListLength = 15,
 		        playerDungeonListLength = 15,
 	        },
 	        ldb = {
@@ -1145,9 +1043,6 @@ function XToLevel.Config:GetDefaults()
 			        kills = true,
 			        quests = true,
 			        dungeons = true,
-			        bgs = true,
-			        bgo = false,
-                    gather = true,
 			        xp = true,
 			        xpnum = true,
 			        xpnumFormat = true,
@@ -1162,10 +1057,8 @@ function XToLevel.Config:GetDefaults()
 		        tooltip = {
 			        showDetails = true,
 			        showExperience = true,
-			        showBGInfo = true,
 			        showDungeonInfo = true,
 			        showTimerInfo = true,
-                    showGatheringInfo = true,
 		        }
 	        },
 	        timer = {
@@ -1190,14 +1083,12 @@ function XToLevel.Config:GetDefaults()
 		        questAverage = 0,
 		        killList = {},
 		        questList = {},
-		        bgList = {},
 		        dungeonList = {},
 		        timer = {
 			        start = nil,
 			        total = nil,
 			        xpPerSec = nil,
 		        },
-                gathering = {},
                 npcXP = { },
 	        },
 	        customPattern = nil,

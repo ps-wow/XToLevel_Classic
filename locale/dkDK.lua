@@ -62,7 +62,6 @@ L['Average'] = "Nogenlunde"
 L['Max'] = "Max"
 L['Min'] = "Min"
 L['Kills to level'] = "Kills to level"
-L['Gathering'] = "Gathering"
 L['Max Level LDB Message'] = "Højeste niveau nået. De LDB datakilder, vil automatisk blive deaktiveret næste gang UI genindlæses."
 
 L["Updating..."] = "Updating..."
@@ -159,12 +158,10 @@ L['Reset Player Kills'] = "Spiller Drab"
 L['Reset Player Quests'] = "Spiller Quests"
 L['Reset Battlegrounds'] = "Battlegrounds"
 L['Reset Dungeons'] = "Dungeons"
-L['Reset Gathering'] = "Gathering"
 L['Reset Player Kill Dialog'] = "Er du sikker på at du vil slette spillerens drab-optagelser?"
 L['Reset Player Quest Dialog'] = "Er du sikker på at du vil slette spillerens quest-optagelser?"
 L['Reset Battleground Dialog'] = "Er du sikker på at du vil slette battleground-optagelser?"
 L['Reset Dungeon Dialog'] = "Er du sikker på at du vil slette spillerens dungeon-optagelser?"
-L['Reset Gathering Dialog'] = "Er du sikker på du vil slette indsamling records?"
 
 -- LDB Text
 L['LDB Enabled'] = "Aktivere"
@@ -188,7 +185,6 @@ L['Show Player Details'] = "Vis spiller detaljer"
 L['Show Player Experience'] = "Vis spiller erfaring"
 L['Show Battleground Info'] = "Vis Battleground Info"
 L['Show Dungeon Info'] = "Vis Dungeon Info"
-L['Show Gathering Info'] = "Show Gathering Info"
 L['Show Timer Details'] = "Vis Timer Info"
 
 -- Timer
