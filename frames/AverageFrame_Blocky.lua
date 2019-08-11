@@ -235,27 +235,27 @@ XToLevel.AverageFrameAPI["Blocky"] =
     SetKills = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterKillsValueText:SetText(tonumber(value))
     end,
-    
+
     --- Sets the quest value for the frame
     SetQuests = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterQuestsValueText:SetText(tonumber(value))
     end,
-    
+
     --- Sets the dungeon value for the frame
     SetDungeons = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterDungeonsValueText:SetText(tonumber(value))
     end,
-    
+
     --- Sets the battle value for the frame
     SetBattles = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterBattlesValueText:SetText(tonumber(value))
     end,
-    
+
     --- Sets the objectives value for the frame
     SetObjectives = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterObjectivesValueText:SetText(tonumber(value))
     end,
-    
+
     --- Sets the gathering average
     SetGathering = function(self, value)
         XToLevel_AverageFrame_Blocky_PlayerFrameCounterGatheringValueText:SetText(tonumber(value))
@@ -269,18 +269,18 @@ XToLevel.AverageFrameAPI["Blocky"] =
             local progressBar = XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgressBar
             local progressBarColor = XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgressBarColor
             local progressText = XToLevel_AverageFrame_Blocky_PlayerFrameCounterProgressValueText
-            
+
             local totalWidth = progressFrame:GetWidth() - 5
             local barWidth = totalWidth * (percent / 100)
             local bars = ceil((100 - percent) / 5)
-            
+
             if barWidth == 0 then
                 barWidth = 1
             end
-            
+
             local hex, rgb = XToLevel.Lib:GetProgressColor(percent)
             rgb = { r= (rgb.r / 256), g= (rgb.g) / 256, b= (rgb.b / 256) }
-            
+
             progressBar:SetWidth(barWidth)
             if XToLevel.db.profile.averageDisplay.progressAsBars then
                 progressText:SetText(tostring(bars) .. " " .. L['Bars'])
