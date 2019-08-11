@@ -382,41 +382,36 @@ function XToLevel:OnChatXPGain(message)
 		--local unrestedXP = XToLevel.Player:GetUnrestedXP(xp)
 		XToLevel.db.char.data.timer.total = XToLevel.db.char.data.timer.total + xp
 	end
-    
+
     -- See if it is a kill or a quest (no mob name means it is a quest or BG objective.)
     if mobName ~= nil then
-		if XToLevel.Player:IsBattlegroundInProgress() then
-			console:log("Battleground Kill detected: " .. tostring(xp) .. "(" .. mobName ..")")
-			XToLevel.Player:AddBattlegroundKill(xp, mobName)
-		else
-			local unrestedXP = XToLevel.Player:AddKill(xp, mobName)
-            
-            -- Update the temporary target list.
-            local found = false;
-            for i, data in ipairs(targetList) do
-                if data.name == mobName and data.dead and data.xp == nil then
-                    targetList[i].xp = unrestedXP
-                    found = true
-                    XToLevel:AddMobXpRecord(data.name, data.level, UnitLevel("player"), data.xp, data.classification)
-                end
-            end
-            if not found then
-                targetUpdatePending = unrestedXP;
-            end
+        local unrestedXP = XToLevel.Player:AddKill(xp, mobName)
 
-			if XToLevel.db.profile.messages.playerFloating or XToLevel.db.profile.messages.playerChat then
-				local killsRequired = XToLevel.Player:GetKillsRequired(unrestedXP)
-				if killsRequired > 0 then
-					XToLevel.Messages.Floating:PrintKill(mobName, ceil(killsRequired / ( (XToLevel.Lib:IsRafApplied() and 3) or 1 )))
-					XToLevel.Messages.Chat:PrintKill(mobName, killsRequired)
-				end
-			end
-			
-			if XToLevel.Player:IsDungeonInProgress() then
-	            console:log("Dungeon Kill detected: " .. tostring(unrestedXP) .. "(" .. mobName ..")")
-	            XToLevel.Player:AddDungeonKill(unrestedXP, mobName, (xp - unrestedXP))
+        -- Update the temporary target list.
+        local found = false;
+        for i, data in ipairs(targetList) do
+            if data.name == mobName and data.dead and data.xp == nil then
+                targetList[i].xp = unrestedXP
+                found = true
+                XToLevel:AddMobXpRecord(data.name, data.level, UnitLevel("player"), data.xp, data.classification)
             end
-		end
+        end
+        if not found then
+            targetUpdatePending = unrestedXP;
+        end
+
+        if XToLevel.db.profile.messages.playerFloating or XToLevel.db.profile.messages.playerChat then
+            local killsRequired = XToLevel.Player:GetKillsRequired(unrestedXP)
+            if killsRequired > 0 then
+                XToLevel.Messages.Floating:PrintKill(mobName, ceil(killsRequired / ( (XToLevel.Lib:IsRafApplied() and 3) or 1 )))
+                XToLevel.Messages.Chat:PrintKill(mobName, killsRequired)
+            end
+        end
+
+        if XToLevel.Player:IsDungeonInProgress() then
+            console:log("Dungeon Kill detected: " .. tostring(unrestedXP) .. "(" .. mobName ..")")
+            XToLevel.Player:AddDungeonKill(unrestedXP, mobName, (xp - unrestedXP))
+        end
     else
         if isQuest then
             XToLevel.Player:AddQuest(xp)
